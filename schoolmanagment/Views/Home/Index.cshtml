@@ -1,0 +1,543 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js"></script>
+    <title>Registration Form</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    
+
+</head>
+<body>
+
+    <style>
+
+            body {
+                background-color: grey;
+                display: inline;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .form-container form {
+                background-color: rgb(230, 234, 238);
+                padding: 20px 30px 20px;
+                position: relative;
+                width: 50%;
+                border-radius: 4px;
+                box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+            }
+
+            h1 {
+                margin: 0px 0px 10px 0px;
+                padding: 0 100px;
+            }
+
+            .input-group {
+                width: 110%;
+                display: flex;
+                align-items: center;
+                margin: 16px 0;
+                position: relative;
+            }
+
+                .input-group label {
+                    flex-basis: 18%;
+                }
+            /*.input-group input, .input-group textarea{
+            flex-basis: 40%;
+            border: 0;
+            outline: 0;
+            padding: 10px 0;
+            border-bottom: 1px solid #999;
+            background-color: rgb(247, 244, 244);
+            color: rgb(0, 0, 0);
+            font-size: 16px;
+        }*/
+            ::placeholder {
+                font-size: 14px;
+            }
+
+            form button {
+                background: #141a34;
+                color: #fff;
+                border-radius: 4px;
+                border: 1px solid rgba(255, 255, 255, 0.7);
+                padding: 10px 40px;
+                outline: 0;
+                cursor: pointer;
+                display: block;
+                align-items: center;
+            }
+
+            #btn-reset {
+                background: white;
+                color: black;
+                padding: 10px 30px;
+                border: 1px solid rgba(255,255,255,0.7);
+            }
+        .input-group {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+       
+
+    </style>
+   
+
+     <div class="form-container">
+        <h1>Student Registration Form</h1>
+        <!---<form action="registration-success.html">-->
+        <h3 id="demo" style="color:white; font-size:15px; display:block; padding:10px; box-shadow:10px 20px 30 white white; background-color:white:"></h3>
+        <div class="input-group">
+            <input type="hidden" placeholder="Id" id="classid">
+        </div>
+
+
+        <div class="input-group">
+            <label><strong>Department:</strong></label>
+            <input type="text" placeholder="Departmentname" id="ClassName">
+        </div>
+
+
+
+
+        <div class="input-group">
+            <label><strong>First Name:</strong></label>
+            <input type="text" placeholder="Enter Your First Name" id="fname">
+        </div>
+
+        <div class="input-group">
+            <label><strong>Last Name:</strong></label>
+            <input type="text" placeholder="Enter Your Last Name" id="lname">
+        </div>
+
+        <div class="input-group">
+            <label><strong>Email Id:</strong></label>
+            <input type="email" placeholder="Enter Your Email Id" id="email-id">
+        </div>
+
+        <div class="input-group">
+            <label><strong>Mobile No.:</strong></label>
+            <input type="tel" placeholder="Enter your mobile number" id="phone-no">
+        </div>
+
+
+        <div class="input-group">
+
+            <button type="button" id="btn-submit" onclick="myFunction()">submit</button>
+            <button type="button" class="btn btn-primary" id="btnupdate" style="display:none;" onclick="updatstudentdata()">Update</button>
+
+        </div>
+
+    
+
+    <script>
+        $(document).ready(function () {
+            binddata();
+            $("#Search").on('input', function () {
+                Functionsearch();
+            });
+        })
+        function myFunction() {
+            alert(1);
+            /************* search function**************************/
+
+            function Searchstudent_List() {
+                var searchemp = $("#searchstudent").val().trim();
+
+                if (searchemp.length === 0) {
+                    location.reload();
+
+                    return;
+                }
+
+                $.ajax({
+                    url: '/Home/index',
+                    type: "GET",
+                    dataType: "json",
+                    data: { Keyword: searchemp }, // Specify the variable clearly
+                    success: function (response) {
+                        if (response.length > 0) {
+                            searchbindemployees(response);
+                        }
+                        else {
+                            console.log("No student found.");
+
+                        }
+                    },
+                    error: function () {
+                        swal("Alert!", "Server Error", "warning");
+                    }
+                });
+
+            }
+
+
+
+
+
+            var ClassName = $("#className").val();
+            var FirstName = $("#fname").val();
+            var LastName = $("#lname").val();
+            var Email = $("#email-id").val();
+            var Mobile = $("#phone-no").val();
+            var mobileRegex = /^[0-9]{10}$/; // Example: exactly 10 digits
+
+
+
+            var formData = new FormData();
+            formData.append("className", $("#ClassName").val());
+            formData.append("FirstName", $("#fname").val());
+            formData.append("LastName", $("#lname").val());
+            formData.append("Email", $("#email-id").val());
+            formData.append("Mobile", $("#phone-no").val());
+
+            $.ajax({
+                url: "/Home/AddClass",
+                type: "POST",
+                data: formData,
+                contentType: false,
+                processData: false,
+
+                success: function (r) {
+                    if (r.msg == '1') {
+                        alert("Data Send Successfully");
+                        binddata();
+                        $("#className").val('');
+                        $("#fname").val('');
+                        $("#lname").val('');
+                        $("#email-id").val('');
+                        $("#phone-no").val('');
+
+
+                        //location.reload();
+                    } else if (r.msg == '0') {
+                        alert("Problem Erase");
+
+
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert("Server is not responding!");
+
+                }
+            })
+
+        }
+
+
+        //GET DATA FROM SERVER//
+
+        function binddata() {
+
+            $.ajax({
+                url: '/Home/BindData',
+                type: "GET",
+                dataType: "json",
+                data: {},
+                success: function (result) {
+                    $("#tabletwo tbody").empty();
+                    $.each(result, function (i, obj) {
+                        $("#tabletwo tbody").append(
+                            "<tr>" +
+                            "<td>" + obj.classId + "</td>" +
+                            "<td>" + obj.className + "</td>" +
+                            "<td>" + obj.FirstName + "</td>" +
+                            "<td>" + obj.LastName + "</td>" +
+                            "<td>" + obj.Email + "</td>" +
+                            "<td>" + obj.Mobile + "</td>" +
+                            "<td>" +
+                            "<button type='button' class='btn btn-warning shadow-primary px-5' " +
+                            "style='color: black;' " +
+                            "onclick='Getclassdata(" + obj.classId + ")'>Edit</button>" +
+                            "</td>" +
+                            "<td>" +
+                            "<button type='button' class='btn btn-warning shadow-primary px-5' " +
+                            "style='color: black;' " +
+                            "onclick='deletedata(" + obj.classId + ")' id='deletebtn'>Delete</button>" +
+                            "</td>" +
+                            "</tr>"
+                        );
+
+                    })
+
+
+
+                }
+            })
+
+
+
+        }
+
+        function Getclassdata(id) {
+            // Create the data object to send
+            var dataobject = {
+                classId: id
+            }
+
+
+            // Make an AJAX request
+            $.ajax({
+                url: "/Home/EditClass",
+                type: "POST",
+                contentType: "application/json", // Specify the content type as JSON
+                processData: false, // Prevent jQuery from processing the data
+                data: JSON.stringify(dataobject), // Convert the data object to a JSON string
+                dataType: "json", // Expect JSON response
+
+                success: function (response) {
+                    $("#btn-submit").hide();
+                    $("#btnupdate").show();
+                    $("#ClassName").val(response.className)
+                    $("#fname").val(response.FirstName)
+                    $("#lname").val(response.LastName)
+                    $("#email-id").val(response.Email)
+                    $("#phone-no").val(response.Mobile)
+                    $("#demo").html("My Name is: " + response.FirstName + " " + response.LastName + "<br>" + " my email is:" + " " + response.Email
+                        + "<br>" + "my phone no is:" + " " + response.Mobile + "<br>" + "my class is:" + " " + response.className);
+
+                },
+                error: function (xhr, status, error) {
+                    alert("Server is not responding");
+                }
+            });
+        }
+
+
+        //UPDATE CODE//
+
+        function updatstudentdata() {
+            var className = $("#className").val();
+            var FirstName = $("#fname").val();
+            var LastName = $("#lname").val();
+            var Email = $("#email-id").val();
+            var Mobile = $("#phone-no").val();
+            var mobileRegex = /^[0-9]{10}$/; // Example: exactly 10 digits
+
+
+            var formData = new FormData();
+            formData.append("className", $("#ClassName").val());
+            formData.append("FirstName", $("#fname").val());
+            formData.append("LastName", $("#lname").val());
+            formData.append("Email", $("#email-id").val());
+            formData.append("Mobile", $("#phone-no").val());
+
+            $.ajax({
+                url: "/Home/UpdateClass",
+                type: "POST",
+                data: formData,
+                contentType: false,
+                processData: false,
+
+                success: function (r) {
+                    if (r.msg == '1') {
+                        alert("Update Data Successfully");
+                        binddata();
+                        $("#className").val('');
+                        $("#fname").val('');
+                        $("#lname").val('');
+                        $("#email-id").val('');
+                        $("#phone-no").val('');
+
+                        //location.reload();
+                    } else if (r.msg == '0') {
+                        alert("Problem Erase");
+
+
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert("Server is not responding!");
+
+                }
+            })
+
+        }
+
+
+        //======Delete Code//
+        function deletedata(id) {
+            // Create the data object to send
+            var dataobject = {
+                deleteid: id
+            }
+            var a = confirm("Do you want to detete data");
+            if (a == '1') {
+                $.ajax({
+                    url: "/Home/deletedataclass",
+                    type: "POST",
+                    contentType: "application/json", // Specify the content type as JSON
+                    processData: false, // Prevent jQuery from processing the data
+                    data: JSON.stringify(dataobject), // Convert the data object to a JSON string
+                    dataType: "json", // Expect JSON response
+
+                    success: function (response) {
+                        if (response.msg = '1') {
+                            alert("Data delete successfully");
+                        }
+                        else {
+                            alert("Data Not Delete");
+                        }
+                        binddata();
+                    },
+                    error: function (xhr, status, error) {
+                        alert("Server is not responding");
+                    }
+                });
+            }
+
+
+            // Make an AJAX request
+
+        }
+
+        /* function searchdata(result) {
+             // Clear existing table rows
+             $("#tabletwo tbody").empty();
+
+             // Append new rows
+             $.each(result, function (i, obj) {
+                 $("#tabletwo tbody").append(
+                     `<tr>
+             <td>${obj.classId}</td>
+             <td>${obj.className}</td>
+             <td>${obj.FirstName}</td>
+             <td>${obj.LastName}</td>
+             <td>${obj.Email}</td>
+             <td>${obj.Mobile}</td>
+             <td>
+                 <button type='button' class='btn btn-warning shadow-primary px-5'
+                     style='color: black;'
+                     onclick='Getclassdata(${obj.classId})'>Edit</button>
+             </td>
+             <td>
+                 <button type='button' class='btn btn-warning shadow-primary px-5'
+                     style='color: black;'
+                     onclick='deletedata(${obj.classId})' id='deletebtn'>Delete</button>
+             </td>
+         </tr>`
+                 );
+             });
+         }
+
+         function Functionsearch() {
+             var search = $("#Search").val().trim();
+             if (search.length === 0) {
+                 binddata();
+                 return;
+             }
+
+             $.ajax({
+                 url: "/Home/SearchFunction",
+                 type: "POST",
+                 data: JSON.stringify({ keyword: search }),
+                 contentType: "application/json; charset=utf-8",
+                 dataType: "json",
+                 success: function (result) {
+                     if (result.length > 0) {
+                         searchdata(result);
+                     } else {
+                         alert("Record not found");
+                         $("#tabletwo tbody").empty(); // Clear table if no records found
+                     }
+                 },
+                 error: function (xhr, status, error) {
+                     alert("Server is not responding");
+                 }
+             });
+         }
+
+         $(document).ready(function () {
+             $("#Search").on('input', function () {
+                 Functionsearch(); // Search data as user types
+             });
+         });*/
+
+
+    </script>
+    </div>
+</body>
+
+
+
+</html>
+
+
+
+      
+        <style>
+            #STUDENT {
+                font-family: Arial, Helvetica, sans-serif;
+                border-collapse: collapse;
+                width: 100%;
+            }
+
+                #STUDENT td, #STUDENT th {
+                    border: 1px solid #ddd;
+                    padding: 20px;
+                }
+
+                #STUDENT tr:nth-child(even) {
+                   /* background-color: #f2f2f2;*/
+                }
+
+                #STUDENT tr:hover {
+                    /*/background-color: #ddd;*/
+                }
+
+                #STUDENT th {
+                    padding-top: 12px;
+                    padding-bottom: 12px;
+                    text-align: left;
+                    background-color: #04AA6D;
+                    color: white;
+                }
+
+                h1{
+                    color:black;
+                    text-align:center
+
+                }
+
+                #button{
+                    margin:auto;
+                }
+        </style>
+
+
+
+            <h1>STUDENT DATA</h1>
+
+            <input type="text" placeholder="Search By Name" id="Search"/>
+            <table class="table table-striped" id="tabletwo">
+                <thead>
+                    <tr>
+                        <th>ClassId</th>
+                        <th>ClassName</th>
+                        <th>FirstName</th>
+                        <th>LastName</th>
+                        <th>Email</th>
+                        <th>Mobile</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
+
+                    </tr>
+                </thead>
+
+                <tbody>
+                   
+                </tbody>
+            </table>
+
+
+
+
